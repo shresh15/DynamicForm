@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { db } from "../firebaseConfig.js";
+import { onSnapshot } from "firebase/firestore";
 import {
   collection,
   query,
@@ -15,56 +16,46 @@ const RenderForm = ({ formName = "User Registration" }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchLatestForm = async () => {
-      try {
-        setLoading(true);
+    setLoading(true);
 
-        const formsRef = collection(db, "forms");
-        const q = query(
-          formsRef,
-          where("formName", "==", formName),
-          orderBy("createdAt", "desc"),
-          limit(1)
-        );
-        const querySnap = await getDocs(q);
+    const formsRef = collection(db, "forms");
+    const q = query(
+      formsRef,
+      where("formName", "==", formName),
+      orderBy("createdAt", "desc"),
+      limit(1)
+    );
 
-        if (querySnap.empty) {
-          console.warn(`No recent form found for "${formName}"`);
-          setFormSchema(null);
-          return;
-        }
-
-        const latestForm = querySnap.docs[0].data();
-
-        // Normalize the fields safely
-        let fieldsArray = Array.isArray(latestForm.fields)
-          ? latestForm.fields
-          : Object.values(latestForm.fields || {});
-
-        fieldsArray = fieldsArray.map((f) => ({
-          label: f.label || "",
-          type: f.type || "text",
-          options: Array.isArray(f.options)
-            ? f.options
-            : f.options
-            ? f.options.split(",").map((o) => o.trim())
-            : [],
-        }));
-
-        setFormSchema({ ...latestForm, fields: fieldsArray });
-      } catch (err) {
-        console.error("Error fetching form:", err);
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      if (snapshot.empty) {
+        console.warn(`No recent form found for "${formName}"`);
         setFormSchema(null);
-      } finally {
         setLoading(false);
+        return;
       }
-    };
 
-    fetchLatestForm();
+      const latestForm = snapshot.docs[0].data();
 
-    // Optionally, re-fetch every 3 seconds while open
-    const interval = setInterval(fetchLatestForm, 3000);
-    return () => clearInterval(interval);
+      let fieldsArray = Array.isArray(latestForm.fields)
+        ? latestForm.fields
+        : Object.values(latestForm.fields || {});
+
+      fieldsArray = fieldsArray.map((f) => ({
+        label: f.label || "",
+        type: f.type || "text",
+        options: Array.isArray(f.options)
+          ? f.options
+          : f.options
+          ? f.options.split(",").map((o) => o.trim())
+          : [],
+      }));
+
+      setFormSchema({ ...latestForm, fields: fieldsArray });
+      setLoading(false);
+    });
+
+    // Cleanup listener on unmount
+    return () => unsubscribe();
   }, [formName]);
 
   const handleChange = (e, label) => {
