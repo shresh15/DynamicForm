@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { PlusCircle, Trash2 } from "lucide-react";
 import { motion } from "framer-motion";
-import FormSchema from "./formSchema";
+import FormSchema from "./FormSchema";
+import RenderForm from "./RenderForm";
 const fieldTypes = [
   { value: "text", label: "Text Field" },
   { value: "number", label: "Number Field" },
@@ -25,6 +26,8 @@ const FormBuilder = () => {
     options: "",
   });
   const [formData, setFormData] = useState({});
+  const [showRender, setShowRender] = useState(false); // 👈 control render state
+  const [formName, setFormName] = useState("User Registration");
 
   const handleAddField = () => {
     if (!newField.label) return alert("Please enter a field label");
@@ -162,7 +165,7 @@ const FormBuilder = () => {
             </div>
             <button
               onClick={handleAddField}
-              className="bg-indigo-900 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-700 transition"
+              className="cursor-pointer bg-indigo-900 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-700 transition"
             >
               <PlusCircle size={20} /> Add Field
             </button>
@@ -220,12 +223,22 @@ const FormBuilder = () => {
             )}
           </form>
           <button
-            onClick={() => FormSchema("User Registration", fields)}
-            className="bg-indigo-900 text-white px-4 py-2 rounded-lg hover:bg-blue-700 mt-auto"
+            onClick={() => FormSchema(formName, fields)}
+            className="cursor-pointer bg-indigo-900 text-white px-4 py-2 rounded-lg hover:bg-blue-700 mt-auto"
           >
             Save Form
           </button>
         </div>
+      </div>
+      {/* Render Form Section */}
+      <div className="text-center">
+        <button
+          onClick={() => setShowRender(true)} // 👈 toggles rendering
+          className="cursor-pointer mt-6 bg-indigo-900 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+        >
+          Render Form
+        </button>
+        {showRender && <RenderForm formName={formName} />}{" "}
       </div>
     </div>
   );

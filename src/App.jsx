@@ -1,6 +1,6 @@
 // App.js
 import React from "react";
-import FormBuilder from "./FormBuilder";
+import FormBuilder from "./components/FormBuilder";
 
 function App() {
   // Replace with actual document ID from Firestore
