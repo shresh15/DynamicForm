@@ -1,23 +1,11 @@
-import React, { useState } from "react";
-import FormBuilder from "./formBuilder";
-import TestFirestore from "./TestFirestore";
+// App.js
+import React from "react";
+import FormBuilder from "./FormBuilder";
 
 function App() {
-  const [schema, setSchema] = useState([]);
-
-  return (
-    // <div style={{ padding: 20 }}>
-    //   <h1 style={{ textAlign: "center" }}>Dynamic Form Builder</h1>
-    //   <FormBuilder onSchemaChange={(fields) => setSchema(fields)} />
-
-    //   {/* <pre style={{ marginTop: 40, background: "#eee", padding: 10 }}>
-    //     <strong>Live JSON Schema:</strong>
-    //     <br />
-    //     {JSON.stringify({ fields: schema }, null, 2)}
-    //   </pre> */}
-    // </div>
-    <TestFirestore />
-  );
+  // Replace with actual document ID from Firestore
+  //const formId = "your_firestore_document_id";
+  return <FormBuilder />;
 }
 
 export default App;

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { PlusCircle, Trash2 } from "lucide-react";
 import { motion } from "framer-motion";
-
+import FormSchema from "./formSchema";
 const fieldTypes = [
   { value: "text", label: "Text Field" },
   { value: "number", label: "Number Field" },
@@ -215,6 +215,12 @@ const FormBuilder = () => {
             fields.map((field, idx) => renderField(field, idx))
           )}
         </form>
+        <button
+          onClick={() => FormSchema("User Registration", fields)}
+          className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
+        >
+          Save Form to Firebase
+        </button>
       </div>
     </div>
   );
