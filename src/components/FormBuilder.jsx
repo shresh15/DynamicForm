@@ -26,7 +26,7 @@ const FormBuilder = () => {
     options: "",
   });
   const [formData, setFormData] = useState({});
-  const [showRender, setShowRender] = useState(false); // 👈 control render state
+  const [showRender, setShowRender] = useState(false); //
   const [formName, setFormName] = useState("User Registration");
 
   const handleAddField = () => {
@@ -248,7 +248,7 @@ const FormBuilder = () => {
       {/* Render Form Section */}
       <div className="text-center">
         <button
-          onClick={() => setShowRender(true)} // 👈 toggles rendering
+          onClick={() => setShowRender(true)} //
           className="cursor-pointer mt-6 bg-indigo-900 text-white px-4 py-2 rounded-md hover:bg-blue-700"
         >
           Render Form

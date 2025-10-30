@@ -53,10 +53,10 @@ const FormSchema = async (formName, fields) => {
       fields,
       createdAt: serverTimestamp(),
     });
-    console.log("✅ Form saved with ID:", docRef.id);
+    console.log("Form saved with ID:", docRef.id);
     alert("Form saved successfully to Firebase!");
   } catch (error) {
-    console.error("❌ Error saving form:", error);
+    console.error(" Error saving form:", error);
     alert("Failed to save form. Check console for details.");
   }
 };
