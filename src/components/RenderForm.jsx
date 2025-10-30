@@ -13,15 +13,12 @@ const RenderForm = ({ formName = "User Registration" }) => {
   const [formSchema, setFormSchema] = useState(null);
   const [formData, setFormData] = useState({});
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchLatestForm = async () => {
       try {
         setLoading(true);
-        setError(null);
 
-        // Fetch the most recent form document matching formName
         const formsRef = collection(db, "forms");
         const q = query(
           formsRef,
@@ -32,30 +29,37 @@ const RenderForm = ({ formName = "User Registration" }) => {
         const querySnap = await getDocs(q);
 
         if (querySnap.empty) {
-          setError(`No recent form found for "${formName}"`);
+          console.warn(`No recent form found for "${formName}"`);
           setFormSchema(null);
-        } else {
-          const latestForm = querySnap.docs[0].data();
-
-          // Validate that fields exists and is an array
-          if (!latestForm?.fields || !Array.isArray(latestForm.fields)) {
-            setError("Invalid Firestore schema: 'fields' array missing.");
-            setFormSchema(null);
-            return;
-          }
-
-          setFormSchema(latestForm);
+          return;
         }
+
+        const latestForm = querySnap.docs[0].data();
+
+        // Normalize the fields safely
+        let fieldsArray = Array.isArray(latestForm.fields)
+          ? latestForm.fields
+          : Object.values(latestForm.fields || {});
+
+        fieldsArray = fieldsArray.map((f) => ({
+          label: f.label || "",
+          type: f.type || "text",
+          options: Array.isArray(f.options)
+            ? f.options
+            : f.options
+            ? f.options.split(",").map((o) => o.trim())
+            : [],
+        }));
+
+        setFormSchema({ ...latestForm, fields: fieldsArray });
       } catch (err) {
         console.error("Error fetching form:", err);
-        setError(
-          "Failed to fetch form. Firestore index might be missing. Check console for details."
-        );
         setFormSchema(null);
       } finally {
         setLoading(false);
       }
     };
+
     fetchLatestForm();
   }, [formName]);
 
@@ -65,24 +69,28 @@ const RenderForm = ({ formName = "User Registration" }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Submitted data:", formData);
-    alert("Form submitted! Check console for values.");
+    console.log("✅ Submitted data:", formData);
+    alert("Form submitted successfully! Check console for details.");
   };
 
   if (loading) return <p className="text-center mt-6">Loading form...</p>;
-  if (error) return <p className="text-center text-red-600 mt-6">{error}</p>;
-  if (!formSchema) return null;
+  if (!formSchema)
+    return (
+      <p className="text-center mt-6 text-gray-700">
+        No form found for "{formName}".
+      </p>
+    );
 
   return (
-    <div className="p-10 bg-gray-100 min-h-100vh flex items-center justify-center">
-      <div className="w-full max-w-2xl">
+    <div className="p-5 bg-gray-200 min-h-2/3 flex items-center justify-center">
+      <div className="w-2/3 max-w-2xl">
         <h1 className="text-3xl font-bold mb-6 text-gray-800 text-center">
           {formName}
         </h1>
 
         <form
           onSubmit={handleSubmit}
-          className="bg-white shadow-xl rounded-2xl p-8 space-y-6 border-2 border-black "
+          className="bg-white shadow-xl rounded-2xl p-8 space-y-6 border-2 border-black"
         >
           {formSchema.fields.map((field, index) => (
             <div key={index} className="flex items-center">
@@ -90,11 +98,11 @@ const RenderForm = ({ formName = "User Registration" }) => {
                 {field.label}
               </label>
               <div className="w-2/3">
-                {field.type === "dropdown" && Array.isArray(field.options) ? (
+                {field.type === "dropdown" && field.options.length > 0 ? (
                   <select
                     value={formData[field.label] || ""}
                     onChange={(e) => handleChange(e, field.label)}
-                    className="border-gray-300 rounded-lg  p-3 w-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                    className="border border-black appearance-none rounded-lg p-3 w-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
                   >
                     <option value="">Select an option</option>
                     {field.options.map((opt, i) => (
@@ -108,7 +116,7 @@ const RenderForm = ({ formName = "User Registration" }) => {
                     type={field.type || "text"}
                     value={formData[field.label] || ""}
                     onChange={(e) => handleChange(e, field.label)}
-                    className="border border-gray-300 rounded-lg p-3 w-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                    className="border border-black rounded-lg p-3 w-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
                     autoComplete="off"
                   />
                 )}

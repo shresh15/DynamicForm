@@ -34,6 +34,12 @@ const FormSchema = async (formName, fields) => {
       }
       // Ensure dropdown options are arrays
       if (field.type === "dropdown") {
+        if (typeof field.options === "string") {
+          field.options = field.options
+            .split(",")
+            .map((opt) => opt.trim())
+            .filter((opt) => opt.length > 0);
+        }
         if (!Array.isArray(field.options)) {
           throw new Error(
             `Field "${field.label}" is a dropdown but options is not an array.`

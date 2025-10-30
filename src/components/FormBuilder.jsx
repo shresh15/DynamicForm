@@ -117,10 +117,13 @@ const FormBuilder = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gray-200">
       <div className="bg-indigo-900 text-white text-center py-4">
-        <h1 className="text-4xl font-bold">Dynamic Form Builder</h1>
+        <h1 className="text-4xl font-bold">FormMate</h1>
       </div>
+      <p className="text-center text-2xl text-black font-sans">
+        The smartest way to create forms.
+      </p>
       <div className="flex justify-center gap-8 p-8">
         {/* Left: Form Design */}
         <div className="w-full md:w-1/3 bg-white border-2 rounded-2xl shadow-xl p-8 flex flex-col">
@@ -223,7 +226,19 @@ const FormBuilder = () => {
             )}
           </form>
           <button
-            onClick={() => FormSchema(formName, fields)}
+            onClick={() =>
+              FormSchema(
+                formName,
+                fields.map((f) =>
+                  f.type === "dropdown"
+                    ? {
+                        ...f,
+                        options: f.options.split(",").map((opt) => opt.trim()),
+                      }
+                    : f
+                )
+              )
+            }
             className="cursor-pointer bg-indigo-900 text-white px-4 py-2 rounded-lg hover:bg-blue-700 mt-auto"
           >
             Save Form
