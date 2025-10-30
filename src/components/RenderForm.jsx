@@ -61,6 +61,10 @@ const RenderForm = ({ formName = "User Registration" }) => {
     };
 
     fetchLatestForm();
+
+    // 🔁 Optionally, re-fetch every 3 seconds while open
+    const interval = setInterval(fetchLatestForm, 3000);
+    return () => clearInterval(interval);
   }, [formName]);
 
   const handleChange = (e, label) => {
